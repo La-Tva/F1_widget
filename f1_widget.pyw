@@ -319,7 +319,7 @@ class ConfigWindow:
                                         activeforeground='white')
         autostart_check.pack(anchor="w", pady=(10, 20))
         
-        # --- Bouton Appliquer ---
+        # --- Boutons ---
         button_frame = tk.Frame(main_frame, bg='#1e1e1e')
         button_frame.pack(fill="x", pady=10)
         
@@ -329,6 +329,13 @@ class ConfigWindow:
                                 bg='#0078D4', fg='white', padx=20, pady=8,
                                 relief="flat", cursor="hand2")
         apply_button.pack(side="right", padx=5)
+        
+        launch_button = tk.Button(button_frame, text="Lancer / Launch", 
+                                 command=self.launch_app,
+                                 font=("Segoe UI", 10, "bold"),
+                                 bg='#00A651', fg='white', padx=20, pady=8,
+                                 relief="flat", cursor="hand2")
+        launch_button.pack(side="right", padx=5)
         
         self.root.attributes("-topmost", True)
         self.result = None
@@ -345,7 +352,26 @@ class ConfigWindow:
         self.result = {
             "language": language,
             "timezone": timezone,
-            "autostart": autostart
+            "autostart": autostart,
+            "launch": False
+        }
+        
+        self.root.destroy()
+    
+    def launch_app(self):
+        """Applique les paramètres et lance l'appli"""
+        language = self.lang_var.get()
+        timezone_name = self.tz_var.get()
+        timezone = TIMEZONES.get(timezone_name, "Europe/Paris")
+        autostart = self.autostart_var.get()
+        
+        save_user_settings(language, autostart, timezone)
+        
+        self.result = {
+            "language": language,
+            "timezone": timezone,
+            "autostart": autostart,
+            "launch": True
         }
         
         self.root.destroy()
@@ -534,8 +560,8 @@ class F1MenubarTicker:
                 d = diff.days
                 h, rem = divmod(diff.seconds, 3600)
                 m, s = divmod(rem, 60)
-                # Texte final : Jour PROCHAINE Pays @ Heure_FR | JoursD HeuresH MinutesM SecondesS
-                txt = f"{day_name} {trans['next']}: {self.country.upper()} @ {heure_fr} | {d}D {h:02d}H {m:02d}M {s:02d}S"
+                # Texte final : PROCHAINE Pays @ Heure_FR | Jour JoursD HeuresH MinutesM SecondesS
+                txt = f"{trans['next']}: {self.country.upper()} @ {heure_fr} | {day_name} {d}D {h:02d}H {m:02d}M {s:02d}S"
                 self.ticker_text.config(text=txt)
             else:
                 # Affichage pendant la course
